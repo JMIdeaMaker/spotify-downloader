@@ -16,6 +16,8 @@ from spotdl.providers.provider_utils import (
     _parse_path_template,
 )
 
+from typing import AnyStr, Callable
+
 
 class DownloadManager:
     def __init__(self, arguments: Optional[dict] = None):
@@ -75,7 +77,7 @@ class DownloadManager:
 
         self._download_asynchronously([song_object])
 
-    def download_multiple_songs(self, song_list: List[SongObject]) -> None:
+    def download_multiple_songs(self, callback: Callable, song_list: List[SongObject]) -> None:
         """
         `list<song_object>` `song_list` : list of songs to be downloaded
 
@@ -89,7 +91,7 @@ class DownloadManager:
 
         self.display_manager.set_song_count_to(len(song_list))
 
-        self._download_asynchronously(song_list)
+        self._download_asynchronously(song_list, callback)
 
     def resume_download_from_tracking_file(self, tracking_file_path: str) -> None:
         """
@@ -109,10 +111,12 @@ class DownloadManager:
 
         self._download_asynchronously(song_list)
 
-    def _download_asynchronously(self, song_obj_list):
+    def _download_asynchronously(self, song_obj_list, callback):
         tasks = [self._pool_download(song) for song in song_obj_list]
         # call all task asynchronously, and wait until all are finished
-        self.loop.run_until_complete(asyncio.gather(*tasks))
+        gather = asyncio.gather(*tasks)
+        gather.add_done_callback(callback)
+        self.loop.run_until_complete(gather)
 
     async def _pool_download(self, song_obj: SongObject):
         # ! Run asynchronous task in a pool to make sure that all processes
