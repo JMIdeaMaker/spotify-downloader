@@ -112,7 +112,10 @@ class DownloadManager:
         self._download_asynchronously(song_list)
 
     def _download_asynchronously(self, song_obj_list, callback):
-        tasks = [self._pool_download(song) for song in song_obj_list]
+        if len(song_obj_list) > 1:
+            tasks = [self._pool_download(song) for song in song_obj_list]
+        else:
+            tasks = [self._pool_download(song_obj_list)]
         # call all task asynchronously, and wait until all are finished
         gather = asyncio.gather(*tasks)
         gather.add_done_callback(callback)
