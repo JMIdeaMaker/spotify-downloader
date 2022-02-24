@@ -77,7 +77,7 @@ class DownloadManager:
 
 		self._download_asynchronously([song_object])
 
-	def download_multiple_songs(self, callback: Callable, song_list: List[SongObject]) -> None:
+	def download_multiple_songs(self, song_list: List[SongObject], callback: Callable,) -> None:
 		"""
 		`list<song_object>` `song_list` : list of songs to be downloaded
 
