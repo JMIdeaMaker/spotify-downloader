@@ -87,6 +87,7 @@ class DownloadManager:
 		"""
 
 		self.download_tracker.clear()
+		print(type(song_list))
 		self.download_tracker.load_song_list(song_list)
 
 		self.display_manager.set_song_count_to(len(song_list))
